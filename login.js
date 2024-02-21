@@ -1,0 +1,28 @@
+const encodeCredentials = (login, password) => Buffer.from(`${encodeURIComponent(login)}:${password}`).toString('base64');
+
+const sendAuthRequest = async ({ login, password }) => {
+ const encodedAuth = encodeCredentials(login, password);
+ const headers = new Headers({
+   Accept: 'application/json',
+   Authorization: `Basic ${encodedAuth}`,
+   UserAgent: `${process.env.APP_NAME}/${process.env.APP_VERSION} ${navigator.userAgent}`,
+ });
+
+ try {
+   const response = await fetch(`https://orioks.miet.ru/api/v1/auth`, {
+     method: 'GET',
+     headers,
+   });
+
+   if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+   const data = await response.json();
+   console.log('Response from server: ', JSON.stringify(data, null, 2));
+ } catch (error) {
+   console.error('Error sending request: ', error);
+ }
+};
+
+// Примеры использования функции
+sendAuthRequest({ login: "username", password: "secret" });
+sendAuthRequest({ login: "anotherUsername", password: "differentSecret" });
